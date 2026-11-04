@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "chain_id": 10143,
+  "block_number": 70382506,
+  "block_hash": "0x8d83641b2861b7a3318d96b476f89305b1820958b2d784d8c9797dc915e12ac4",
+  "block_timestamp": 1791803575,
+  "genesis_hash": "0x298034669ee44327d2da9744b9b2782848e2f2a6959756b7b0471b09a404f5c9",
+  "rpc_url": "https://testnet-rpc.monad.xyz",
+  "pool_address": "0x0c7d08ad0fc858012399194b6701382bda0e8928",
+  "oracle_address": "0xcabb964b9ffc74f0ab67b9a7c3f61d900c6090d1",
+  "pool_runtime_keccak": "0x2a944af579047350af50f4676c562887bd21193fc0ba1a425c14e95fd9807f4b",
+  "provenance": {
+    "description": "Immutable public header, pool runtime and oracle storage anchors for the opt-in read-only Monad Testnet fork smoke. Deployment report is not a runtime dependency.",
+    "deployment_status_sha256": "72f80883e919ad9c309553860cd944b2274f22a171782b33278693e8a451cf4f"
+  }
+}

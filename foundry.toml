@@ -1,0 +1,13 @@
+[profile.default]
+src = "contracts"
+test = "tests/solidity"
+out = "solidity-out"
+cache_path = "solidity-cache"
+libs = []
+optimizer = true
+optimizer_runs = 200
+via_ir = false
+evm_version = "osaka"
+gas_limit = "18446744073709551615"
+remappings = ["lib/=tests/fixtures/solidity/protocol-v5/lib/", "src/=tests/fixtures/solidity/protocol-v5/src/", "test/CreditPool/=tests/fixtures/solidity/protocol-v5/test/CreditPool/", "test/mocks/=tests/fixtures/solidity/protocol-v5/test/mocks/", "forge-std/=tests/fixtures/solidity/protocol-v5/lib/forge-std/src/"]
+fs_permissions = [{access="read",path="tests/fixtures/uniswap-v3"},{access="read-write",path="tests/fixtures/solidity/generated"}]

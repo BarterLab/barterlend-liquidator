@@ -1,0 +1,29 @@
+[package]
+name = "barterlend-liquidator"
+version = "0.1.0"
+license = "MIT"
+edition = "2024"
+rust-version = "1.98"
+publish = false
+default-run = "barterlend-liquidator"
+
+[dependencies]
+alloy = { version = "=1.8.3", features = ["full"] }
+barterlend-state = { git = "https://github.com/BarterLab/barterlend-state.git", rev = "57befaa69d0046e3e569dced26c1a3f6763b72fe" }
+async-trait = "=0.1.89"
+futures-util = "=0.3.32"
+reqwest = { version = "=0.13.3", default-features = false, features = ["json", "rustls", "query"] }
+thiserror = "=2.0.18"
+clap = { version = "4", features = ["derive", "env"] }
+color-eyre = "0.6"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "=0.8.23"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "time"] }
+libc = "=0.2.189"
+zeroize = "=1.8.2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "time"] }
+
+[dev-dependencies]
+tempfile = "=3.27.0"

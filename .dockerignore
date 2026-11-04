@@ -1,0 +1,17 @@
+**
+!Cargo.toml
+!Cargo.lock
+!rust-toolchain.toml
+!src/
+!src/**
+!abi/
+!abi/**
+!scripts/
+!scripts/check-release.py
+!Dockerfile
+**/.git
+**/.env*
+**/*.key
+**/*.pem
+**/*.p12
+**/*.pfx

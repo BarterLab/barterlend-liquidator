@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "profile": "local",
+  "rpc_url": "http://127.0.0.1:8545",
+  "rpc_fallback_urls": [],
+  "recovery": {
+    "max_head_age_seconds": 120,
+    "max_no_progress_seconds": 30,
+    "max_future_seconds": 15,
+    "retry_initial_ms": 500,
+    "retry_max_ms": 30000
+  },
+  "cancellation_retry_seconds": 30,
+  "sdk_history_chunks_per_step": 8,
+  "chain": {
+    "chain_id": 31337,
+    "genesis_hash": "0x3e8b48d8cbf5dfa86c941f2c1821786417d34ef516ef1a336fdb035f984f89e9"
+  },
+  "executor": "0xa648d767E212563209D177FDe18476765D00a9eD",
+  "executor_code_hash": "0x65a4d74b9931c21f43a0b70bff3fb3c5efc240ea68639d2a4380ec7af2a5243b",
+  "owner": "0x02dE1753A19d14F0415737A73926e051675391Bd",
+  "operator": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "pools": {
+    "local-pool": {
+      "spec": {
+        "address": "0x2a07706473244BC757E10F2a9E86fB532828afe3",
+        "deployment_block": 0,
+        "expected_version": 5,
+        "deployment_block_hash": "0x3e8b48d8cbf5dfa86c941f2c1821786417d34ef516ef1a336fdb035f984f89e9"
+      },
+      "code_hash": "0xc82530b6db8030e6b41f23c9ee8cbea238591151180c9ba3bebbbfa78f5c2fc0",
+      "asset": {
+        "address": "0xa0Cb889707d426A7A386870A03bc70d1b0697598",
+        "decimals": 18
+      },
+      "collateral": {
+        "address": "0xc7183455a4C133Ae270771860664b6B7ec320bB1",
+        "decimals": 18
+      },
+      "oracle": "0xD6BbDE9174b1CdAa358d2Cf4D57D1a9F7178FBfF",
+      "oracle_code_hash": "0xca2e94548f1ed26ce420eeae15e0b9554173a588c1d9c90d3bbf038b0410d722"
+    }
+  },
+  "v3": {
+    "chain": {
+      "chain_id": 31337,
+      "genesis_hash": "0x3e8b48d8cbf5dfa86c941f2c1821786417d34ef516ef1a336fdb035f984f89e9"
+    },
+    "factory": "0x1aF7f588A501EA2B5bB3feeFA744892aA2CF00e6",
+    "router": "0xe8dc788818033232EF9772CB2e6622F1Ec8bc840",
+    "quoter": "0x3Cff5E7eBecb676c3Cb602D0ef2d46710b88854E",
+    "wrapped_native": "0x13aa49bAc059d709dd0a18D6bb63290076a702D7",
+    "code_hashes": {
+      "factory": "0x2040ba5862294b281327670191c541d448b063c6e9bdabe8dc8cc7451d659f96",
+      "router": "0x5f51eadd45eeeb508ebe04248e906f3072950392cabd0fd6b3b4e88119e97a25",
+      "quoter": "0x9e6cf039bb9af54dc930799276471a78e28c9b246dfb528ea021260c74787b3a",
+      "wrapped_native": "0x8189e2c67822c0df07edc17d3cabab3f0489e2b850c0637d3aecf1361a63cc38"
+    },
+    "allowed_tokens": [
+      "0xa0Cb889707d426A7A386870A03bc70d1b0697598",
+      "0xc7183455a4C133Ae270771860664b6B7ec320bB1",
+      "0x13aa49bAc059d709dd0a18D6bb63290076a702D7"
+    ],
+    "intermediates": [
+      "0x13aa49bAc059d709dd0a18D6bb63290076a702D7"
+    ],
+    "fee_tiers": [
+      500,
+      3000
+    ],
+    "pool_code_hashes": {},
+    "limits": {
+      "max_candidates": 16,
+      "max_quote_calls": 16,
+      "quote_ttl_seconds": 30,
+      "max_age_blocks": 100,
+      "slippage_bps": 100
+    }
+  },
+  "fees": {
+    "gas_margin_bps": 1500,
+    "max_gas_limit": 2000000,
+    "max_gas_price": "0x2540be400",
+    "max_fee_native": "0x16345785d8a0000",
+    "native_reserve": "0x2386f26fc10000"
+  },
+  "planner": {
+    "max_candidates": 12,
+    "partial_divisors": [
+      2,
+      3,
+      4,
+      8,
+      16
+    ],
+    "ttl_seconds": 30
+  },
+  "additional_profit_asset": "0x0",
+  "max_total_native_spend": "0xde0b6b3a7640000",
+  "max_attempts_per_nonce": 4,
+  "max_paid_failures_per_state": 3,
+  "poll_ms": 100,
+  "queue_capacity": 100,
+  "cooldown_seconds": 1,
+  "rpc": {
+    "requests_per_second": 1000
+  }
+}

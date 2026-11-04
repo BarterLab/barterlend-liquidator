@@ -1,0 +1,53 @@
+[
+  {
+    "package": "@uniswap/v3-core",
+    "version": "1.0.1",
+    "url": "https://registry.npmjs.org/@uniswap/v3-core/-/v3-core-1.0.1.tgz",
+    "integrity": "sha512-7pVk4hEm00j9tc71Y9+ssYpO6ytkeI0y7WE9P6UcmNzhxPePwyAxImuhVsTqWK9YFvzgtvzJHi64pBl4jUzKMQ==",
+    "tarball_sha256": "141b001e2a376fff867cb24e0713b2834095cb1250c13aae263d9a646446d329",
+    "artifacts": [
+      {
+        "contract": "UniswapV3Factory",
+        "file": "UniswapV3Factory.json",
+        "sha256": "599479f60ebb056804aff7b2d05bdd0830ddbb1fdfaa0b6c62c02294ca7188b0",
+        "creation_bytecode_keccak": "0xa9cb11ffa1b1bf9a9a2b70b66f6a22db3e8328b37ec44e6ce602749081efdb6d"
+      },
+      {
+        "contract": "UniswapV3Pool",
+        "file": "UniswapV3Pool.json",
+        "sha256": "204fb2fa7ad1a639b1df5601f035f9924b064b721b97adf60c7d5d4712643e34",
+        "creation_bytecode_keccak": "0xe34f199b19b2b4f47f68442619d555527d244f78a3297ea89325f843f87b8b54"
+      }
+    ]
+  },
+  {
+    "package": "@uniswap/v3-periphery",
+    "version": "1.4.4",
+    "url": "https://registry.npmjs.org/@uniswap/v3-periphery/-/v3-periphery-1.4.4.tgz",
+    "integrity": "sha512-S4+m+wh8HbWSO3DKk4LwUCPZJTpCugIsHrWR86m/OrUyvSqGDTXKFfc2sMuGXCZrD1ZqO3rhQsKgdWg3Hbb2Kw==",
+    "tarball_sha256": "7177174c4b8c66bd1d61e7c4127ee15e95f851edfb1a65ee8225b6ab4f818bd7",
+    "artifacts": [
+      {
+        "contract": "QuoterV2",
+        "file": "QuoterV2.json",
+        "sha256": "9d0b8700b8b144aced9b5dd95bce4a68e03eb9a809eac53ac2e3ce739cc7d289",
+        "creation_bytecode_keccak": "0x807900529037b0db5b299ed312e4b1820210b5e9922b6c4fcd4c23de67ee5f1a"
+      }
+    ]
+  },
+  {
+    "package": "@uniswap/swap-router-contracts",
+    "version": "1.3.1",
+    "url": "https://registry.npmjs.org/@uniswap/swap-router-contracts/-/swap-router-contracts-1.3.1.tgz",
+    "integrity": "sha512-mh/YNbwKb7Mut96VuEtL+Z5bRe0xVIbjjiryn+iMMrK2sFKhR4duk/86mEz0UO5gSx4pQIw9G5276P5heY/7Rg==",
+    "tarball_sha256": "efad19ccb35c90338981f06ef7acc6daa5cce7a8139611167270eb7b2a1e26df",
+    "artifacts": [
+      {
+        "contract": "SwapRouter02",
+        "file": "SwapRouter02.json",
+        "sha256": "210a7bf29f26de9f45d35dac1214943eca41c3a002007dd6a0e1aa870bf2d2d1",
+        "creation_bytecode_keccak": "0x603dca716e6cc8be026ebc49ab95f5c163b4b2ec4019615e607ec91710734841"
+      }
+    ]
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "protocol_version": 5,
+  "source_head": "81d2b8b93013f3b9dd56655f818b0586437c2279",
+  "source_fixture": "../solidity/protocol-v5",
+  "source_input_manifest_sha256": "4bbdbedefc288f1e798b9c6e1566208fe0433749bbb9b265fee6f8a822dc499b",
+  "library_gitlinks": {
+    "forge-std": "0844d7e1fc5e60d77b68e469bff60265f236c398",
+    "openzeppelin-contracts": "fcbae5394ae8ad52d8e580a3477db99814b9d565",
+    "permit2": "cc56ad0f3439c502c246fc5cfcc3db92bb8b7219",
+    "aave-v3-origin": "5a230ec82fcb10afc7fe7cffa8978752fb17aa2b"
+  },
+  "source_files": [
+    {
+      "path": "src/CreditPoolBase.sol",
+      "sha256": "5bfea59bb86f8cecbe546e9abeefe9e678827bd33b06bf323381a12aaa3f6840",
+      "bytes": 141472
+    },
+    {
+      "path": "src/lib/PriceMath.sol",
+      "sha256": "8a74787a95e271fa807ef0ea238531d62d1c417851f69a05b24e1e610c759244",
+      "bytes": 728
+    },
+    {
+      "path": "src/facets/CreditPoolFacet1.sol",
+      "sha256": "769dcbfa51c7bdf9fa885fcc11a9c9da023e606d1c5787a089ac59495eb68910",
+      "bytes": 3246
+    },
+    {
+      "path": "test/CreditPool/0_base.t.sol",
+      "sha256": "07939b2d8f5c0c2c050e14bcbb1e7f4d3b4c8f51eb3a893113c92001e2018d44",
+      "bytes": 15327
+    }
+  ],
+  "generator_sha256": "3f8592e4c6777eed01869857d7bae5a14b8c3ef35526aab7fc4fc7ba2067cfa0",
+  "goldens_sha256": "d7dff39a377dbea51d1ac8736e967f54aaa49a82a337f804e3e3eeb347253ef3",
+  "compiler": "solc0.8.31",
+  "foundry": "1.8.4",
+  "evm_version": "osaka",
+  "via_ir": false,
+  "optimizer_runs": 200,
+  "literal_cases": 13,
+  "deterministic_cases": 128,
+  "fuzz_runs": 0,
+  "recording": "Actual CreditPool.liquidate public calls; repayment/seizure token deltas, borrower primitive getters and BadDebtIncurred logs. No expected cap implementation.",
+  "source_input_manifest": "../solidity/PROTOCOL_INPUTS.json"
+}

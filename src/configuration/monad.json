@@ -1,0 +1,60 @@
+{
+  "chain": {
+    "chain_id": 143,
+    "genesis_hash": "0x0c47353304f22b1c15706367d739b850cda80b5c87bbc335014fef3d88deaac9"
+  },
+  "v3": {
+    "factory": "0x204faca1764b154221e35c0d20abb3c525710498",
+    "router": "0xfe31f71c1b106eac32f1a19239c9a9a72ddfb900",
+    "quoter": "0x661e93cca42afacb172121ef892830ca3b70f08d",
+    "wrapped_native": "0x3bd359c1119da7da1d913d1c4d2b7c461115433a"
+  },
+  "v3_code_hashes": {
+    "factory": "0x343475d01b14fa838452aebbc1b600ef871a46233c97effb3260bb9a2597d519",
+    "router": "0xe38b18a40559752e867d4e6039977e65754dddb68c3c254ec46aebb2195391b6",
+    "quoter": "0xad90650112df6d1329f20af88a7ad67de8249cae2092e2660ced24e647a9a5be",
+    "wrapped_native": "0xa32df4f1226f1bb0d6ce9b917752ed687857899a35ebf902c9992edb73b138b6"
+  },
+  "v4": {
+    "manager": "0x188d586ddcf52439676ca21a244753fa19f9ea8e",
+    "quoter": "0xa222dd357a9076d1091ed6aa2e16c9742dd26891",
+    "manager_code_hash": "0xf5d7a45765367807b101f825ec74004078c79bd96c621e481c608ee22f7336d4",
+    "quoter_code_hash": "0x3666b10d21aee597139d129b378b2cdaeaaaaaffeb142c1f64366a7bd5be8b3b",
+    "pools": [
+      {
+        "currency0": "0x754704bc059f8c67012fed69bc8a327a5aafb603",
+        "currency1": "0xee8c0e9f1bffb4eb878d8f15f368a02a35481242",
+        "fee": 500,
+        "tick_spacing": 10,
+        "hooks": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "currency0": "0x00000000efe302beaa2b3e6e1b18d08d69a9012a",
+        "currency1": "0x754704bc059f8c67012fed69bc8a327a5aafb603",
+        "fee": 50,
+        "tick_spacing": 1,
+        "hooks": "0x0000000000000000000000000000000000000000"
+      },
+      {
+        "currency0": "0x754704bc059f8c67012fed69bc8a327a5aafb603",
+        "currency1": "0xd18b7ec58cdf4876f6afebd3ed1730e4ce10414b",
+        "fee": 500,
+        "tick_spacing": 10,
+        "hooks": "0x0000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "kyber": {
+    "base_url": "https://aggregator-api.kyberswap.com",
+    "router": "0x6131b5fae19ea4f9d964eac0408e4408b66337b5",
+    "router_code_hash": "0x73055c10f463ef7d44c444ccae0b71ab4cacaf67aedbad2cd8af639d53cc6316",
+    "client_id": "barterlend-liquidator",
+    "requests_per_second": 3,
+    "ttl_seconds": 30
+  },
+  "intermediates": [
+    "0x754704bc059f8c67012fed69bc8a327a5aafb603",
+    "0x3bd359c1119da7da1d913d1c4d2b7c461115433a",
+    "0xee8c0e9f1bffb4eb878d8f15f368a02a35481242"
+  ]
+}

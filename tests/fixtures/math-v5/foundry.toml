@@ -1,0 +1,22 @@
+[profile.default]
+src = "empty-src"
+test = "solidity"
+out = "out"
+cache_path = "cache"
+libs = []
+optimizer = true
+optimizer_runs = 200
+via_ir = false
+evm_version = "osaka"
+gas_limit = "18446744073709551615"
+allow_paths = ["../solidity/protocol-v5"]
+remappings = [
+  "src/=../solidity/protocol-v5/src/",
+  "test/=../solidity/protocol-v5/test/",
+  "lib/=../solidity/protocol-v5/lib/",
+  "forge-std/=../solidity/protocol-v5/lib/forge-std/src/"
+]
+fs_permissions = [{ access = "read-write", path = "./generated" }]
+
+[profile.default.fuzz]
+runs = 256

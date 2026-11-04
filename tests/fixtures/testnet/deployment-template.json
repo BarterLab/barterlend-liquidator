@@ -1,0 +1,433 @@
+{
+  "target_chain_id": 10143,
+  "compiler": "solc0.8.31 optimizer200 viaIR=false Osaka",
+  "artifact_bundle": "Supply the offline build-testnet-artifacts.py bundle with --artifacts.",
+  "constructor_abi_rule": "Use canonical tuple types recursively from each artifact constructor ABI; never cast bytes32 receipt config as an address.",
+  "deployments": [
+    {
+      "id": "facet1",
+      "contract": "CreditPoolFacet1",
+      "constructor": []
+    },
+    {
+      "id": "facet2",
+      "contract": "CreditPoolFacet2",
+      "constructor": []
+    },
+    {
+      "id": "facet3",
+      "contract": "CreditPoolFacet3",
+      "constructor": []
+    },
+    {
+      "id": "facet4",
+      "contract": "CreditPoolFacet4",
+      "constructor": []
+    },
+    {
+      "id": "asset",
+      "contract": "TestnetToken",
+      "constructor": [
+        "${owner}",
+        "Test Stack Asset",
+        "tsASSET"
+      ]
+    },
+    {
+      "id": "collateral",
+      "contract": "TestnetToken",
+      "constructor": [
+        "${owner}",
+        "Test Stack Collateral",
+        "tsCOLL"
+      ]
+    },
+    {
+      "id": "wrapped_native",
+      "contract": "TestnetWrappedMON",
+      "constructor": []
+    },
+    {
+      "id": "oracle",
+      "contract": "TestnetOracle",
+      "constructor": [
+        "${owner}",
+        "${collateral}",
+        "${asset}"
+      ]
+    },
+    {
+      "id": "receipt",
+      "contract": "TestnetAaveReceipt",
+      "constructor": [
+        "${owner}",
+        "${asset}"
+      ]
+    },
+    {
+      "id": "underlying",
+      "contract": "TestnetAavePool",
+      "constructor": [
+        "${asset}",
+        "${receipt}"
+      ]
+    },
+    {
+      "id": "adapter",
+      "contract": "AaveV3Adapter",
+      "constructor": []
+    },
+    {
+      "id": "permit2",
+      "contract": "Permit2",
+      "constructor": []
+    },
+    {
+      "id": "factory",
+      "contract": "UniswapV3Factory",
+      "constructor": []
+    },
+    {
+      "id": "router",
+      "contract": "SwapRouter02",
+      "constructor": [
+        "0x0000000000000000000000000000000000000000",
+        "${factory}",
+        "0x0000000000000000000000000000000000000000",
+        "${wrapped_native}"
+      ]
+    },
+    {
+      "id": "quoter",
+      "contract": "QuoterV2",
+      "constructor": [
+        "${factory}",
+        "${wrapped_native}"
+      ]
+    },
+    {
+      "id": "bootstrap",
+      "contract": "TestnetV3Bootstrap",
+      "constructor": [
+        "${owner}",
+        "${factory}"
+      ]
+    },
+    {
+      "id": "credit_pool",
+      "contract": "CreditPool",
+      "constructor": [
+        [
+          "${owner}",
+          "${permit2}",
+          "${asset}",
+          [
+            "${adapter}",
+            "${receipt_bytes32_left_padded}"
+          ],
+          "${oracle}",
+          "${collateral}",
+          3600,
+          "0",
+          "340282366920938463463374607431768211455",
+          "1000000000000000000",
+          "1000000000000000000",
+          8,
+          1,
+          "500000000000000000",
+          "500000000000000000",
+          "50000000000000000",
+          "200000000000000000",
+          60,
+          "10000000000000000000",
+          [
+            [
+              600,
+              600,
+              600
+            ],
+            [
+              3,
+              3,
+              3
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        ],
+        [
+          "${facet1}",
+          "${facet2}",
+          "${facet3}",
+          "${facet4}"
+        ]
+      ],
+      "requires_before_deploy": [
+        "receipt.setPool(underlying) receipt.POOL==underlying",
+        "adapter.validate(asset,receiptbytes32) success"
+      ]
+    },
+    {
+      "id": "lending_factory",
+      "contract": "TestLendingFactory",
+      "constructor": [
+        "${owner}"
+      ]
+    },
+    {
+      "id": "executor",
+      "contract": "LiquidationExecutor",
+      "constructor": [
+        "${owner}",
+        "${operator}",
+        "${router}",
+        "${factory}",
+        [
+          "${lending_factory}"
+        ]
+      ]
+    }
+  ],
+  "before_credit_pool": [
+    {
+      "to": "${receipt}",
+      "method": "setPool(address)",
+      "args": [
+        "${underlying}"
+      ],
+      "post": "POOL()==underlying; binding exactly once"
+    }
+  ],
+  "owner_configuration": [
+    {
+      "to": "${asset}",
+      "method": "mint(address,uint256)",
+      "args": [
+        "${owner}",
+        "2000000000000000000000000"
+      ]
+    },
+    {
+      "to": "${collateral}",
+      "method": "mint(address,uint256)",
+      "args": [
+        "${owner}",
+        "2000000000000000000000000"
+      ]
+    },
+    {
+      "to": "${wrapped_native}",
+      "method": "deposit()",
+      "args": [],
+      "value_wei": "1000000000000000000"
+    },
+    {
+      "to": "${asset}",
+      "method": "approve(address,uint256)",
+      "args": [
+        "${bootstrap}",
+        "1001025000000000000000000"
+      ]
+    },
+    {
+      "to": "${collateral}",
+      "method": "approve(address,uint256)",
+      "args": [
+        "${bootstrap}",
+        "1000000000000000000000001"
+      ]
+    },
+    {
+      "to": "${wrapped_native}",
+      "method": "approve(address,uint256)",
+      "args": [
+        "${bootstrap}",
+        "1000000000000000000"
+      ]
+    },
+    {
+      "to": "${bootstrap}",
+      "method": "seedPool(address,address,uint24,uint160,int24,int24,uint128)",
+      "args": [
+        "${collateral}",
+        "${asset}",
+        3000,
+        "79228162514264337593543950336",
+        -887220,
+        887220,
+        "1000000000000000000000000"
+      ],
+      "post": "factory.getPool(collateral,asset,3000) nonzero; liquidity()==1000000e18"
+    },
+    {
+      "to": "${bootstrap}",
+      "method": "seedPool(address,address,uint24,uint160,int24,int24,uint128)",
+      "args": [
+        "${asset}",
+        "${wrapped_native}",
+        3000,
+        "${asset_lt_wrapped ? 2475880078570760549798248448 : 2535301200456458802993406410752}",
+        -887220,
+        887220,
+        "32000000000000000000"
+      ],
+      "post": "factory.getPool(asset,wrapped,3000) nonzero; liquidity()==32e18; MON reserve <=1MON"
+    },
+    {
+      "to": "${executor}",
+      "method": "setVerifiedToken(address,bool)",
+      "args": [
+        "${asset}",
+        true
+      ]
+    },
+    {
+      "to": "${executor}",
+      "method": "setVerifiedToken(address,bool)",
+      "args": [
+        "${collateral}",
+        true
+      ]
+    },
+    {
+      "to": "${executor}",
+      "method": "setVerifiedToken(address,bool)",
+      "args": [
+        "${wrapped_native}",
+        true
+      ]
+    },
+    {
+      "to": "${executor}",
+      "method": "setIntermediate(address,bool)",
+      "args": [
+        "${wrapped_native}",
+        true
+      ]
+    },
+    {
+      "to": "${executor}",
+      "method": "setFee(uint24,bool)",
+      "args": [
+        3000,
+        true
+      ]
+    },
+    {
+      "to": "${lending_factory}",
+      "method": "registerPool(address)",
+      "args": [
+        "${credit_pool}"
+      ]
+    }
+  ],
+  "provided_position_template": [
+    {
+      "actor": "owner",
+      "to": "${collateral}",
+      "method": "mint(address,uint256)",
+      "args": [
+        "${borrower}",
+        "400000000000000000000"
+      ]
+    },
+    {
+      "actor": "borrower",
+      "to": "${collateral}",
+      "method": "approve(address,uint256)",
+      "args": [
+        "${credit_pool}",
+        "400000000000000000000"
+      ]
+    },
+    {
+      "actor": "borrower",
+      "to": "${credit_pool}",
+      "method": "depositCollateral(address,uint64,uint128)",
+      "args": [
+        "${borrower}",
+        "${market_from_getActiveMarkets}",
+        "400000000000000000000"
+      ]
+    },
+    {
+      "actor": "borrower",
+      "to": "${credit_pool}",
+      "method": "placeBorrowOrder(address,uint64,uint256,uint128)",
+      "args": [
+        "${borrower}",
+        "${market_from_getActiveMarkets}",
+        0,
+        "100000000000000000000"
+      ]
+    },
+    {
+      "actor": "owner",
+      "to": "${asset}",
+      "method": "mint(address,uint256)",
+      "args": [
+        "${provider}",
+        "100000000000000000000"
+      ]
+    },
+    {
+      "actor": "provider",
+      "to": "${asset}",
+      "method": "approve(address,uint256)",
+      "args": [
+        "${credit_pool}",
+        "100000000000000000000"
+      ]
+    },
+    {
+      "actor": "provider",
+      "to": "${credit_pool}",
+      "method": "deposit(address,uint128)",
+      "args": [
+        "${provider}",
+        "100000000000000000000"
+      ]
+    },
+    {
+      "actor": "provider",
+      "to": "${credit_pool}",
+      "method": "provideExactIn(address,uint64,uint128,uint128,uint16)",
+      "args": [
+        "${provider}",
+        "${market_from_getActiveMarkets}",
+        "100000000000000000000",
+        0,
+        10
+      ],
+      "post": "debtOf(market,borrower)==100e18; collateralOf==400e18; Provided.fills includes borrower"
+    }
+  ],
+  "eligibility_change": {
+    "actor": "owner",
+    "to": "${oracle}",
+    "method": "setPriceFraction(uint256,uint256)",
+    "args": [
+      "400000000000000000",
+      "1000000000000000000"
+    ],
+    "post": "fresh updatedAt from actual chain timestamp; no lending logs required; position HF<1"
+  },
+  "native_cost_route": {
+    "exact_output_reverse_path": "wrapped_native+uint24(3000)+asset",
+    "AMM_initial_asset_per_MON": 1024,
+    "reserve_MON": 1,
+    "require": "quote gasLimit*gasPrice output with reserve/slippage; execution profit covers conservative quote; tiny native output only is insufficient evidence"
+  },
+  "resumption": "Before send load durable receipt/journal; compare code identity, owner/config getters, exact LP position and balances. Never repeat mint/deposit/seed because a local log is missing. seedPool is fresh-only and intentionally reverts on repeat.",
+  "maturity": "Use actual mined timestamp. First market is deploymenttimestamp+600; select a still-active market after setup. Public test waits for market+60 grace; never warp/inject storage.",
+  "limits": [
+    "Synthetic owned tokens/oracle/underlying, not production token or oracle acceptance.",
+    "Permit2 runtime exact pinned copy; EIP712 dynamic separator validated for10143; no cached31337domain acceptance.",
+    "Debt/collateral18decimals; decimals differential was independently covered locally.",
+    "Only direct collateral/asset and asset/MON cost route initially; a collateral/WMON twohop requires an additional real pool and MON reserve.",
+    "All public sends must go through separately authorized bounded resumable runner."
+  ]
+}

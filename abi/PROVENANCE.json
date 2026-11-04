@@ -1,0 +1,10 @@
+{
+  "source": "contracts/LiquidationExecutor.sol",
+  "source_sha256": "9336788edebf9dd0764eba66c02f07038095b4fc41bf79f215f1e4e506efc74c",
+  "abi_sha256": "78b31a95b4ab06a0f265a97787294c6109e4f0d936fa68bdd7e27e50a6d7d9e3",
+  "solc": "0.8.31",
+  "via_ir": false,
+  "optimizer_runs": 200,
+  "evm_version": "osaka",
+  "deployment_executed": false
+}

@@ -1,0 +1,8 @@
+{
+  "source": "https://github.com/BarterLab/barterlend-state/tree/57befaa69d0046e3e569dced26c1a3f6763b72fe/tests/fixtures",
+  "purpose": "disposable local Multicall3 test runtime; no external deployment",
+  "files": {
+    "multicall3-runtime.hex": "8c339f482df725e523c2c45c3ff6139c3303ff1a4fd868e0ccdedc8a2a00d6e4",
+    "multicall3-LICENSE": "2f7380c80b2911360de7778ba9fb8a829c6b04ca9eecdd7aae68222484cb3dd1"
+  }
+}
