@@ -115,11 +115,11 @@ impl HealthSnapshot {
 
 pub struct Diagnostics {
     manifest: LocalManifest, live: bool, epochs: BTreeMap<Address, u64>, routes: BTreeMap<Address, RouteObservation>,
-    last_publish: Option<Instant>, active_observed: Option<(u64, Instant)>, health: Arc<RwLock<Option<HealthSnapshot>>>,
+    last_publish: Option<Instant>, last_summary: Option<Instant>, last_skip: Option<(PositionKey, &'static str, u64)>, active_observed: Option<(u64, Instant)>, health: Arc<RwLock<Option<HealthSnapshot>>>,
 }
 impl Diagnostics {
     pub fn new(manifest: &LocalManifest, live: bool) -> Self {
-        Self { manifest: manifest.clone(), live, epochs: BTreeMap::new(), routes: BTreeMap::new(), last_publish: None, active_observed: None, health: Arc::new(RwLock::new(None)) }
+        Self { manifest: manifest.clone(), live, epochs: BTreeMap::new(), routes: BTreeMap::new(), last_publish: None, last_summary: None, last_skip: None, active_observed: None, health: Arc::new(RwLock::new(None)) }
     }
     /// Update the bounded pool catalog without resetting counters or route observations.
     pub(crate) fn update_catalog(&mut self, manifest:&LocalManifest) {
@@ -144,6 +144,9 @@ impl Diagnostics {
         if !self.configured(key.pool) { return; }
         self.routes.insert(key.pool, RouteObservation { key: *key, as_of: *at, epoch: self.epochs.get(&key.pool).copied(), amount_in,
             outcome: safe_code(code).into(), successful_quotes: None, search: None, best_amount_out: None, best_minimum_out: None, validated_at: None });
+    }
+    pub(crate) fn skipped(&mut self, key: &PositionKey, reason: &'static str) {
+        self.last_skip = Some((*key, safe_code(reason), unix_ms()));
     }
     pub fn validated(&mut self, key: &PositionKey, at: &BlockRef) {
         if let Some(route) = self.routes.get_mut(&key.pool).filter(|r| r.key == *key && r.as_of == *at) { route.validated_at = Some(*at); }
@@ -267,6 +270,25 @@ impl Diagnostics {
         if changed {
             emit_stdout(&serde_json::json!({"event":"health_changed","status":snapshot.status,"stage":snapshot.stage,"reason":snapshot.reason}));
         }
+        // Reuse the health frame: no additional RPC, position scan or per-block logging.
+        if self.last_summary.is_none_or(|at| at.elapsed() >= Duration::from_secs(60)) {
+            emit_stdout(&serde_json::json!({"event":"runtime_summary","mode":snapshot.mode,
+                "status":snapshot.status,"stage":snapshot.stage,"reason":snapshot.reason,
+                "head_block":snapshot.head.map(|h|h.number),"head_age_ms":snapshot.head_age_ms,
+                "pools":snapshot.pools.len(),"actionable_pools":snapshot.pools.iter().filter(|p|p.actionable).count(),
+                "queued":snapshot.queue_len,"tx_phase":snapshot.tx.phase,"tx_hash":snapshot.tx.last_hash,
+                "counters":snapshot.counters,"native_balance":snapshot.native_balance.raw,
+                "budget_remaining":snapshot.budget.remaining,"log_dropped":snapshot.delivery.log_dropped,
+                "last_skip":self.last_skip.map(|(key,reason,at)|serde_json::json!({"key":key,"reason":reason,"observed_unix_ms":at}))}));
+            for pool in &snapshot.pools {
+                emit_stdout(&serde_json::json!({"event":"pool_status","pool":pool.pool,"actionable":pool.actionable,
+                    "block":pool.as_of.map(|b|b.number),"block_lag":pool.block_lag,"state_age_ms":pool.state_age_ms,
+                    "positions":pool.positions_total,"with_debt":pool.debt_positive,"eligible":pool.eligible.filter(|_|pool.actionable),
+                    "risk_unavailable":pool.risk_unavailable,"oracle":pool.oracle_status,
+                    "oracle_updated_at":pool.oracle_updated_at,"freshness":pool.freshness,"last_error":pool.last_error}));
+            }
+            self.last_summary = Some(Instant::now());
+        }
         *self.health.write().map_err(|_| eyre!("health lock poisoned"))? = Some(snapshot);
         self.last_publish = Some(Instant::now());
         Ok(())
@@ -353,6 +375,31 @@ pub fn emit_stdout(value: &serde_json::Value) {
 }
 pub fn emit_stderr(value: &serde_json::Value) {
     crate::diagnostics_io::emit(value,true);
+}
+/// Expose typed failure categories and numeric codes, never provider messages or URLs.
+pub fn rpc_failure(error: &color_eyre::eyre::Report) -> serde_json::Value {
+    use barterlend_state::Error;
+    let (reason, code) = match error.downcast_ref::<Error>() {
+        Some(Error::Rpc { code, .. }) => ("rpc_response_error", Some(*code)),
+        Some(Error::Transport(_)) => ("rpc_transport_error", None),
+        Some(Error::Decode(_)) => ("rpc_decode_error", None),
+        Some(Error::NonCanonical(_)) => ("noncanonical_anchor", None),
+        Some(Error::MissingBlock(_)) => ("missing_block", None),
+        Some(Error::IdentityMismatch(_)) => ("identity_mismatch", None),
+        Some(Error::ResourceLimit(_)) => ("rpc_resource_limit", None),
+        _ => {
+            let mut text = BoundedDisplay(String::new());
+            let _ = std::fmt::write(&mut text, format_args!("{error}"));
+            (match text.0.as_str() {
+                "RPC head is ahead of local clock tolerance" => "head_ahead_of_clock",
+                "RPC head exceeds wall-clock age budget" => "head_too_old",
+                "RPC head stopped advancing" => "head_not_advancing",
+                "recovery endpoint identity mismatch" => "identity_mismatch",
+                _ => "unclassified_redacted",
+            }, None)
+        },
+    };
+    serde_json::json!({"reason":reason,"rpc_code":code})
 }
 pub fn emit_error(code: &'static str, error: &dyn Display, key: Option<&PositionKey>) {
     emit_stderr(&serde_json::json!({"event": "diagnostic_error", "schema_version": 1, "code": safe_code(code), "cause": safe_reason(error), "key": key}));

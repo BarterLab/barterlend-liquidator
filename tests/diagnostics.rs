@@ -307,3 +307,23 @@ async fn http_readiness_and_metrics_report_stale_observation_without_restarting(
     let metrics=client.get(format!("http://{address}/metrics")).send().await.unwrap().text().await.unwrap();
     assert!(metrics.contains("barterlend_ready 0"));assert!(metrics.contains("barterlend_state_age_seconds"));
 }
+
+#[test]
+fn rpc_log_details_keep_codes_but_never_provider_text_or_credentials() {
+    use barterlend_liquidator::diagnostics::rpc_failure;
+    use barterlend_state::Error;
+    let secret = "https://user:DO_NOT_EXPORT@example.invalid/private?token=DO_NOT_EXPORT";
+    for (error, reason, code) in [
+        (Error::Rpc {code:429,message:secret.into()}, "rpc_response_error", Some(429)),
+        (Error::Rpc {code:-32000,message:secret.into()}, "rpc_response_error", Some(-32000)),
+        (Error::Transport(secret.into()), "rpc_transport_error", None),
+        (Error::Decode(secret.into()), "rpc_decode_error", None),
+        (Error::IdentityMismatch(secret.into()), "identity_mismatch", None),
+    ] {
+        let output=rpc_failure(&color_eyre::eyre::Report::from(error).wrap_err("request failed"));
+        assert_eq!(output["reason"],reason);assert_eq!(output["rpc_code"],serde_json::json!(code));
+        assert!(!output.to_string().contains("DO_NOT_EXPORT"));
+    }
+    assert_eq!(rpc_failure(&color_eyre::eyre::eyre!("RPC head stopped advancing"))["reason"],"head_not_advancing");
+    assert_eq!(rpc_failure(&color_eyre::eyre::eyre!(secret))["reason"],"unclassified_redacted");
+}

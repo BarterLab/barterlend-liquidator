@@ -169,6 +169,11 @@ async fn ingest_pools<R: StateReader + 'static>(manifest: LocalManifest, reader:
                     view.snapshot=engine.snapshot_shared();view.verified=false;
                     match result {
                         Ok(SyncStepOutcome::Complete(_))=>{
+                            if view.last_success_unix_ms.is_none() {
+                                emit_stdout(&serde_json::json!({"event":"pool_synced","pool":pool.spec.address,
+                                    "block":view.snapshot.as_ref().map(|s|s.as_of.number),
+                                    "positions":view.snapshot.as_ref().map(|s|s.positions.len())}));
+                            }
                             view.verified=true;
                             if view.verified { view.last_success_unix_ms=Some(unix_ms()); }
                             view.last_error=None;
@@ -178,7 +183,11 @@ async fn ingest_pools<R: StateReader + 'static>(manifest: LocalManifest, reader:
                             view.last_error=Some("state_discovery_in_progress");backoff.reset();delay=Duration::from_millis(manifest.poll_ms);
                             emit_stdout(&serde_json::json!({"event":"state_discovery_progress","pool":pool.spec.address,"through_block":progress.through.map(|b|b.number),"target_block":progress.target.number,"discovered_positions":progress.discovered_positions}));
                         },
-                        Err(error)=>{ view.last_error=Some("state_sync_failed");emit_error("state_sync_failed",&error,None); },
+                        Err(error)=>{
+                            view.last_error=Some("state_sync_failed");
+                            crate::diagnostics::emit_stderr(&serde_json::json!({"event":"diagnostic_error","code":"state_sync_failed",
+                                "pool":pool.spec.address,"failure":crate::diagnostics::rpc_failure(&error.into())}));
+                        },
                     }
                 }
                 tx.send_modify(|views| { views.insert(pool.spec.address,view.clone()); });
@@ -379,6 +388,7 @@ async fn healthy_head(manifest: &LocalManifest, reader: &HttpReader, monitors: &
     for offset in 0..reader.rpc().endpoint_count() {
         let index=(initial+offset)%reader.rpc().endpoint_count();
         reader.rpc().select_endpoint(index)?;
+        let started=Instant::now();
         let observation=tokio::time::timeout(Duration::from_secs(5),async {
             if reader.identity().await?!=manifest.chain { return Err(eyre!("recovery endpoint identity mismatch")); }
             let head=reader.head(Commitment::Latest).await?;
@@ -390,7 +400,12 @@ async fn healthy_head(manifest: &LocalManifest, reader: &HttpReader, monitors: &
                 if index!=initial { emit_stdout(&serde_json::json!({"event":"rpc_endpoint_recovered","endpoint_index":index,"block_number":head.number})); }
                 return Ok(head);
             },
-            _ => emit_stdout(&serde_json::json!({"event":"rpc_endpoint_unavailable","endpoint_index":index,"reason":"rpc_unhealthy"})),
+            Ok(Err(error)) => emit_stdout(&serde_json::json!({"event":"rpc_check_failed","endpoint_index":index,
+                "operation":"identity_and_head","elapsed_ms":started.elapsed().as_millis() as u64,
+                "failure":crate::diagnostics::rpc_failure(&error)})),
+            Err(_) => emit_stdout(&serde_json::json!({"event":"rpc_check_failed","endpoint_index":index,
+                "operation":"identity_and_head","elapsed_ms":started.elapsed().as_millis() as u64,
+                "failure":{"reason":"health_check_timeout","timeout_ms":5000}})),
         }
     }
     Err(eyre!("all configured RPC endpoints unavailable or stale"))
@@ -442,6 +457,10 @@ async fn run_inner(manifest: LocalManifest, options: RunOptions, signer: Option<
     // Register before the first RPC and retain this receiver throughout the run.
     // Recreating ctrl_c in each select loses signals received during RPC work.
     if shutdown_requested(shutdown.as_mut()).await? { return Ok(RunReport::default()); }
+    emit_stdout(&serde_json::json!({"event":"bot_starting","mode":if options.live {"live"} else {"dry_run"},
+        "chain_id":manifest.chain.chain_id,"executor":manifest.executor,"operator":manifest.operator,
+        "configured_pools":manifest.pools.len(),"factory_discovery":manifest.discovery.is_some(),
+        "uniswap_v3":true,"uniswap_v4":manifest.v4.is_some(),"kyber":manifest.kyber.is_some()}));
     let mut diagnostics = Diagnostics::new(&manifest, options.live).with_health(health);
     let progress=Arc::new(crate::server::Progress::default());
     let _health_server = crate::server::start(manifest.health_listen, diagnostics.health(), progress.clone()).await?;
@@ -748,7 +767,7 @@ async fn run_loop(manifest: &LocalManifest, options: &RunOptions, signer: Option
                                 }
                             } else { report.dry_run_plans += 1; emit_stdout(&serde_json::json!({"event":"dry_run_validated","key":candidate.key,"gas_limit":plan.envelope().gas_limit,"min_asset_profit":plan.metadata().min_asset_profit})); scheduler.failed(&candidate,head.timestamp)?; }
                         }
-                        Err(error) => { report.skips += 1; emit_stdout(&serde_json::json!({"event":"position_skipped","key":candidate.key,"reason":safe_reason(&error)})); emit_error("position_preparation_failed", &error, Some(&candidate.key)); scheduler.failed(&candidate,head.timestamp)?; }
+                        Err(error) => { report.skips += 1; diagnostics.skipped(&candidate.key,safe_reason(&error)); emit_stdout(&serde_json::json!({"event":"position_skipped","key":candidate.key,"reason":safe_reason(&error)})); emit_error("position_preparation_failed", &error, Some(&candidate.key)); scheduler.failed(&candidate,head.timestamp)?; }
                     }
                 }
             }
